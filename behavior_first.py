@@ -239,15 +239,17 @@ class Behavior_clone(nn.Module):
         conv_sizes = [(img_shape[0],)] + conv_sizes
         layers = it.chain(*[conv_block(prev[0], curr[0], curr[1], curr[2]) for prev, curr in zip(conv_sizes, conv_sizes[1:])])
         self.conv = nn.Sequential(*layers)
-        #print(self.conv)
+        
         img_flatten_size = img_shape[1:]
+        
         #Use of formula in : https://pytorch.org/docs/stable/nn.html#torch.nn.MaxPool2d to calculate input size for first layer of the fully connected block
         for i in range(len(conv_sizes)-1):
             img_flatten_size = floor((img_flatten_size[0] + 2 * 0 - 1 * (2 - 1) - 1) / 2 + 1), floor((img_flatten_size[1] + 2 * 0 - 1 * (2 - 1) - 1) / 2 + 1)
+        
         img_flatten_size = img_flatten_size[0] * img_flatten_size[1] * conv_sizes[-1][0]
         self.fc = network_from_shape((img_flatten_size + speed_size,) + network_lin_shape + (2,), activation=nn.ReLU())
         self.fc = nn.Sequential(*self.fc)
-        #print(self.fc)
+        
 
     def forward(self, img, speed):
         """Passing img and speed input as describe in NVIDIA architecture
@@ -343,8 +345,9 @@ if __name__ == '__main__':
 
 """Data : scene_fpv -> contains all images, and circuit_cw_user. csv -> all corresponding values
 
-"""
-"""
+    EXAMPLE
+    #######
+    
     tmp = pd.read_csv('circuit_cw_user.csv')['speed']
     bins = np.arange(tmp.min(), tmp.max())
     dataset = ADLDataset('scene_fpv/', 'circuit_cw_user.csv', bins)
